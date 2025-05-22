@@ -73,6 +73,23 @@ SentimentFlow API provides sentiment analysis capabilities through a RESTful API
 
 7. Access the API documentation at http://localhost:8000/docs
 
+## Pushing to a New GitHub Repository
+
+1. Create a new repository on GitHub (e.g., `SENTIMENTFLOW-API`) via the GitHub web interface, **without** initializing with a README or .gitignore.
+
+2. In your terminal, run the following commands from your project root:
+
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git branch -M main
+   git remote add origin https://github.com/Tgedin/SENTIMENTFLOW-API.git
+   git push -u origin main
+   ```
+
+3. Your code is now pushed to your new GitHub repository.
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
