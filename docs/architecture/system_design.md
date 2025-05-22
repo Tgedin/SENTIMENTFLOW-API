@@ -2,7 +2,7 @@
 
 ## Architecture Summary
 
-The SentimentFlow API follows a microservices architecture with four specialized containers that work together. Each container handles one specific aspect of the system, allowing for independent scaling and maintenance.
+The SentimentFlow API follows a cloud-native architecture with serverless components that work together. The architecture is designed to be deployable in both AWS and Azure environments, providing flexibility and avoiding vendor lock-in.
 
 ```
 +---------------+    +------------------+

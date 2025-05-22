@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: sentimentflow-api
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/sentimentflow
+      - REDIS_URI=redis://redis:6379/0
+      - LOG_LEVEL=INFO
+      # Add other environment variables as needed
+    volumes:
+      - ./app:/app/app  # For development - enable hot reloading
+      - ./data:/app/data
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - sentimentflow-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  mongodb:
+    image: mongo:6.0
+    container_name: sentimentflow-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - sentimentflow-network
+    restart: unless-stopped
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    environment:
+      # For development only - add authentication in production
+      - MONGO_INITDB_DATABASE=sentimentflow
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: sentimentflow-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - sentimentflow-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    command: redis-server --appendonly yes
+
+networks:
+  sentimentflow-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
+  redis-data:

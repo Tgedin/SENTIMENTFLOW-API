@@ -1,6 +1,6 @@
 # SentimentFlow API
 
-A microservices-based sentiment analysis API built with FastAPI, MongoDB, and Redis.
+A microservices-based sentiment analysis API with cloud integration built with FastAPI, Docker, and AWS/Azure services.
 
 ## Project Purpose
 
@@ -8,22 +8,27 @@ This project was created as a personal learning endeavor to gain hands-on experi
 
 - FastAPI framework
 - Docker containerization
-- MongoDB database
+- Cloud services (AWS Lambda/Azure Functions)
+- Serverless architecture
+- Cloud databases (MongoDB/DynamoDB)
 - NLP techniques (sentiment analysis, text preprocessing)
 - API security patterns
-- Microservices architecture
+- Cloud monitoring and observability
 
 While the repository is public, its primary purpose is educational rather than for production use. I've put significant emphasis on writing comprehensive documentation as if it were a professional project to reinforce best practices.
 
 ## Overview
 
-SentimentFlow API provides sentiment analysis capabilities through a RESTful API interface. The system is designed with a microservices architecture that demonstrates scalability, maintainability, and performance considerations.
+SentimentFlow API provides sentiment analysis capabilities through a RESTful API interface. The system is designed with cloud-native architecture that demonstrates scalability, maintainability, and performance considerations using serverless computing.
 
 ## Key Features
 
 - Real-time sentiment analysis of text inputs
+- Multiple model approaches (BERT, distilled models)
 - Detailed sentiment breakdown with confidence scores
-- Caching system for improved performance on repeated requests
+- Serverless deployment options for cost-effective scaling
+- Cloud database integration for persistent storage
+- Infrastructure-as-Code templates for consistent deployments
 - Comprehensive API documentation
 - Authentication and rate limiting
 - Historical analysis tracking
@@ -38,8 +43,11 @@ SentimentFlow API provides sentiment analysis capabilities through a RESTful API
 
 - **Backend**: FastAPI (Python 3.9+)
 - **Core Dependencies**: Uvicorn, Pydantic, pytest
-- **Database**: MongoDB
+- **Database**: MongoDB/DynamoDB
 - **Caching**: Redis
+- **Cloud Services**: AWS Lambda/Azure Functions
+- **Monitoring**: CloudWatch/Azure Monitor
+- **Infrastructure**: Terraform/CloudFormation/ARM Templates
 - **Containerization**: Docker & Docker Compose
 - **NLP**: Hugging Face Transformers, NLTK, spaCy, transformers-based sentiment models (BERT, RoBERTa)
 
