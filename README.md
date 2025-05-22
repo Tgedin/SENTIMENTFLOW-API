@@ -2,9 +2,22 @@
 
 A microservices-based sentiment analysis API built with FastAPI, MongoDB, and Redis.
 
+## Project Purpose
+
+This project was created as a personal learning endeavor to gain hands-on experience with:
+
+- FastAPI framework
+- Docker containerization
+- MongoDB database
+- NLP techniques (sentiment analysis, text preprocessing)
+- API security patterns
+- Microservices architecture
+
+While the repository is public, its primary purpose is educational rather than for production use. I've put significant emphasis on writing comprehensive documentation as if it were a professional project to reinforce best practices.
+
 ## Overview
 
-SentimentFlow API provides sentiment analysis capabilities through a RESTful API interface. The system is designed with a microservices architecture that ensures scalability, maintainability, and high performance.
+SentimentFlow API provides sentiment analysis capabilities through a RESTful API interface. The system is designed with a microservices architecture that demonstrates scalability, maintainability, and performance considerations.
 
 ## Key Features
 
@@ -21,21 +34,21 @@ SentimentFlow API provides sentiment analysis capabilities through a RESTful API
 - [System Design](./docs/architecture/system_design.md) - Technical architecture and system design documentation
 - API Documentation (available at `/docs` when running the API)
 
-## Getting Started
+## Technology Stack
 
-### Prerequisites
+- **Backend**: FastAPI (Python 3.9+)
+- **Core Dependencies**: Uvicorn, Pydantic, pytest
+- **Database**: MongoDB
+- **Caching**: Redis
+- **Containerization**: Docker & Docker Compose
+- **NLP**: Hugging Face Transformers, NLTK, spaCy, transformers-based sentiment models (BERT, RoBERTa)
 
-- Python 3.8+
-- Docker and Docker Compose
-- MongoDB
-- Redis
-
-### Installation
+## Local Development Setup
 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/sentimentflow-api.git
+   git clone https://github.com/Tgedin/sentimentflow-api.git
    cd sentimentflow-api
    ```
 
@@ -71,24 +84,16 @@ SentimentFlow API provides sentiment analysis capabilities through a RESTful API
    uvicorn app.main:app --reload
    ```
 
-7. Access the API documentation at http://localhost:8000/docs
+## Learning Outcomes
 
-## Pushing to a New GitHub Repository
+This project is instrumental in understanding:
 
-1. Create a new repository on GitHub (e.g., `SENTIMENTFLOW-API`) via the GitHub web interface, **without** initializing with a README or .gitignore.
-
-2. In your terminal, run the following commands from your project root:
-
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git branch -M main
-   git remote add origin https://github.com/Tgedin/SENTIMENTFLOW-API.git
-   git push -u origin main
-   ```
-
-3. Your code is now pushed to your new GitHub repository.
+- How to structure a FastAPI application
+- MongoDB integration in a Python ecosystem
+- NLP processing pipelines for text analysis
+- Docker containerization for microservices
+- API security best practices
+- Documentation standards in professional software development
 
 ## License
 
