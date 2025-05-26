@@ -1,108 +1,161 @@
 # SentimentFlow API
 
-A microservices-based sentiment analysis API with cloud integration built with FastAPI, Docker, and AWS/Azure services.
+> **🎯 Learning-Focused FastAPI & ML Integration Project**
 
-## Project Purpose
+A hands-on learning project that demonstrates modern Python API development with FastAPI and machine learning model integration. Built for **local development** and educational purposes.
 
-This project was created as a personal learning endeavor to gain hands-on experience with:
+```
+                    📊 Sentiment Analysis Pipeline
 
-- FastAPI framework
-- Docker containerization
-- Cloud services (AWS Lambda/Azure Functions)
-- Serverless architecture
-- Cloud databases (MongoDB/DynamoDB)
-- NLP techniques (sentiment analysis, text preprocessing)
-- API security patterns
-- Cloud monitoring and observability
+   User Input  ──▶  FastAPI  ──▶  ML Models  ──▶  MongoDB  ──▶  Results
+      📝            🚀           🤖 BERT         🗄️           📈
+                                🤖 RoBERTa
+                                🤖 DistilBERT
+```
 
-While the repository is public, its primary purpose is educational rather than for production use. I've put significant emphasis on writing comprehensive documentation as if it were a professional project to reinforce best practices.
+## 🎯 Project Purpose
 
-## Overview
+This project emphasizes **hands-on learning** over complex production features, focusing on:
 
-SentimentFlow API provides sentiment analysis capabilities through a RESTful API interface. The system is designed with cloud-native architecture that demonstrates scalability, maintainability, and performance considerations using serverless computing.
+- **FastAPI Framework**: Modern Python API development with automatic documentation
+- **ML Model Integration**: Multiple transformer models (BERT, RoBERTa, DistilBERT)
+- **Local Database**: MongoDB integration with Docker Compose
+- **Testing Strategies**: Unit, integration, and API testing patterns
+- **Clean Architecture**: Repository patterns and service layer design
+- **Documentation**: Professional-level docs for learning best practices
 
-## Key Features
+## ✨ Key Features
 
-- Real-time sentiment analysis of text inputs
-- Multiple model approaches (BERT, distilled models)
-- Detailed sentiment breakdown with confidence scores
-- Serverless deployment options for cost-effective scaling
-- Cloud database integration for persistent storage
-- Infrastructure-as-Code templates for consistent deployments
-- Comprehensive API documentation
-- Authentication and rate limiting
-- Historical analysis tracking
+- 🔍 **Real-time sentiment analysis** with confidence scores
+- 🤖 **Multiple ML models** comparison (BERT variants)
+- 📊 **Historical data storage** with MongoDB
+- 🚀 **Interactive API docs** at `/docs` endpoint
+- 🧪 **Comprehensive testing** suite
+- 🎨 **Simple web interface** for demonstration
+- ⚡ **Fast local development** setup
 
-## Documentation
+## 📁 Documentation
 
-- [Project Structure](docs/architecture/project_structure.md) - Complete project directory structure and organization
-- [System Design](./docs/architecture/system_design.md) - Technical architecture and system design documentation
-- API Documentation (available at `/docs` when running the API)
+- [📋 Development Roadmap](docs/todo.md) - Current phase progress and learning objectives
+- [🏗️ Project Structure](docs/architecture/project_structure.md) - Complete directory organization
+- [🎨 System Design](docs/architecture/system_design.md) - Architecture and data flow
+- [🚀 API Documentation](http://localhost:8001/docs) - Interactive docs (when running)
 
-## Technology Stack
+## 🛠️ Technology Stack
 
-- **Backend**: FastAPI (Python 3.9+)
-- **Core Dependencies**: Uvicorn, Pydantic, pytest
-- **Database**: MongoDB/DynamoDB
-- **Caching**: Redis
-- **Cloud Services**: AWS Lambda/Azure Functions
-- **Monitoring**: CloudWatch/Azure Monitor
-- **Infrastructure**: Terraform/CloudFormation/ARM Templates
-- **Containerization**: Docker & Docker Compose
-- **NLP**: Hugging Face Transformers, NLTK, spaCy, transformers-based sentiment models (BERT, RoBERTa)
+```
+   API Layer          ML Layer           Data Layer
+   ┌─────────┐       ┌─────────┐       ┌─────────┐
+   │ FastAPI │ ────▶ │  BERT   │ ────▶ │ MongoDB │
+   │ Uvicorn │       │ RoBERTa │       │ Docker  │
+   │ Pydantic│       │DistilBERT│      │ Compose │
+   └─────────┘       └─────────┘       └─────────┘
+```
 
-## Local Development Setup
+- **🐍 Backend**: FastAPI (Python 3.12+)
+- **🤖 ML Models**: Hugging Face Transformers (BERT, RoBERTa, DistilBERT)
+- **🗄️ Database**: MongoDB with Docker Compose
+- **🔧 Core Tools**: Uvicorn, Pydantic, pytest
+- **📦 Development**: Docker, Docker Compose
+- **🧪 Testing**: pytest, httpx, unittest
 
-1. Clone the repository:
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.12+
+- Docker & Docker Compose
+- Git
+
+### Setup
+
+1. **Clone the repository:**
 
    ```bash
    git clone https://github.com/Tgedin/sentimentflow-api.git
    cd sentimentflow-api
    ```
 
-2. Create and activate a virtual environment:
+2. **Create virtual environment:**
 
    ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   source venv/bin/activate  # Windows: venv\Scripts\activate
    ```
 
-3. Install dependencies:
+3. **Install dependencies:**
 
    ```bash
    pip install -r requirements.txt
-   pip install -r requirements-dev.txt  # For development
    ```
 
-4. Copy the example environment file and modify as needed:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-5. Start the services using Docker Compose:
+4. **Start MongoDB (optional for basic testing):**
 
    ```bash
    docker-compose up -d
    ```
 
-6. Run the application:
+5. **Run the API:**
 
    ```bash
-   uvicorn app.main:app --reload
+   uvicorn app.main:app --reload --port 8001
    ```
 
-## Learning Outcomes
+6. **Test the API:**
+   ```bash
+   # Open browser to http://localhost:8001/docs
+   # Or test with curl:
+   curl -X POST "http://localhost:8001/api/v1/sentiment/analyze" \
+        -H "Content-Type: application/json" \
+        -d '{"text": "I love learning FastAPI!"}'
+   ```
 
-This project is instrumental in understanding:
+## 🧪 Running Tests
 
-- How to structure a FastAPI application
-- MongoDB integration in a Python ecosystem
-- NLP processing pipelines for text analysis
-- Docker containerization for microservices
-- API security best practices
-- Documentation standards in professional software development
+```bash
+# Run all tests
+pytest
 
-## License
+# Run with coverage
+pytest --cov=app
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+# Run specific test categories
+pytest tests/unit/        # Unit tests
+pytest tests/integration/ # Integration tests
+```
+
+## 📈 Current Progress
+
+- ✅ **Phase 1**: Core API & ML integration (Complete)
+- 🔄 **Phase 2**: Database & storage (In Progress)
+- ⏳ **Phase 3**: Web interface
+- ⏳ **Phase 4**: Model comparison & testing
+- ⏳ **Phase 5**: Documentation & polish
+
+## 🎓 Learning Outcomes
+
+Through this project, you'll gain hands-on experience with:
+
+- 🚀 **FastAPI**: Modern async Python web framework
+- 🤖 **ML Integration**: Working with transformer models
+- 🗄️ **Database Design**: MongoDB document modeling
+- 🧪 **Testing**: API testing strategies and best practices
+- 📚 **Documentation**: Writing clear, professional docs
+- 🛠️ **Development**: Local development workflow and tooling
+
+## 🤝 Contributing
+
+This is a personal learning project, but feedback and suggestions are welcome! Feel free to:
+
+- 🐛 Report bugs or issues
+- 💡 Suggest improvements or learning opportunities
+- 📚 Share educational resources related to the tech stack
+- 🤔 Ask questions about the implementation
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+_Built with ❤️ for learning FastAPI and ML integration_

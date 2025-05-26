@@ -1,134 +1,171 @@
 # SentimentFlow API - System Design Document
 
-## Architecture Summary
+## Architecture Overview
 
-The SentimentFlow API follows a cloud-native architecture with serverless components that work together. The architecture is designed to be deployable in both AWS and Azure environments, providing flexibility and avoiding vendor lock-in.
+SentimentFlow API is designed as a **learning-focused local development project** that demonstrates modern Python API development with machine learning integration. The architecture prioritizes simplicity, clarity, and educational value over complex production patterns.
 
 ```
-+---------------+    +------------------+
-|               |    |                  |
-| API Gateway   +--->+ NLP Processing   |
-| (FastAPI)     |    | Engine           |
-|               |    |                  |
-+-------+-------+    +------------------+
-        |
-        v
-+-------+-------+    +------------------+
-|               |    |                  |
-| Data Storage  +--->+ Caching Layer    |
-| (MongoDB)     |    | (Redis)          |
-|               |    |                  |
-+---------------+    +------------------+
+                    🎯 Local Development Architecture
+
+   ┌─────────────┐    ┌──────────────┐    ┌─────────────┐
+   │   Client    │───▶│   FastAPI    │───▶│ ML Models   │
+   │ (Browser/   │    │   Server     │    │ (Hugging    │
+   │  API calls) │    │ (Port 8001)  │    │  Face)      │
+   └─────────────┘    └──────┬───────┘    └─────────────┘
+                             │
+                             ▼
+                      ┌─────────────┐
+                      │  MongoDB    │
+                      │ (Docker)    │
+                      │ Port 27017  │
+                      └─────────────┘
 ```
 
-### Components:
+### Core Components
 
-1. **API Gateway**
+1. **🚀 FastAPI Application Server**
 
-   - Functions as the system's front door, handling all client interactions through FastAPI
-   - Manages authentication, request validation, and rate limiting
-   - Provides automatic API documentation via Swagger UI
-   - Routes requests to appropriate services
+   - Handles HTTP requests and responses
+   - Provides automatic API documentation at `/docs`
+   - Manages request validation with Pydantic models
+   - Runs on `localhost:8001` for development
 
-2. **NLP Processing Engine**
+2. **🤖 ML Processing Pipeline**
 
-   - Contains the machine learning pipeline for sentiment analysis
-   - Handles text preprocessing (tokenization, stop-word removal, normalization)
-   - Performs model inference using pre-trained BERT models
-   - Formats results for client consumption
+   - Multiple transformer models (BERT, RoBERTa, DistilBERT)
+   - Text preprocessing and tokenization
+   - Sentiment classification with confidence scores
+   - Lazy model loading for faster startup
 
-3. **Data Storage Layer**
+3. **🗄️ MongoDB Database (Optional)**
 
-   - Uses MongoDB for persistent storage
-   - Stores analysis results, user data, and system metrics
-   - Leverages document-based structure for flexible schema requirements
+   - Document storage for analysis results
+   - User session tracking (UUID-based)
+   - Historical data for analytics
+   - Runs in Docker container for easy setup
 
-4. **Caching Layer**
-   - Employs Redis to store frequently accessed results and session data
-   - Improves response times for repeated queries
-   - Reduces computational costs by minimizing redundant processing
+4. **🎨 Web Interface (Planned)**
+   - Simple HTML/CSS/JavaScript frontend
+   - Real-time sentiment analysis demo
+   - Results visualization and history
+   - Served directly from FastAPI
 
 ## Data Flow Architecture
 
 ```
-   +--------+    +-----------------+    +----------------+
-   | Client +--->+ API Gateway     +--->+ NLP Processing |
-   +--------+    | - Authentication|    | - Text Analysis|
-                 | - Validation    |    +--------+-------+
-                 +-----------------+             |
-                         ^                       v
-                         |               +-------+-------+
-                  +------+------+        | Data Storage  |
-                  | Response    |<-------+ & Caching     |
-                  +-------------+        +---------------+
+                    📊 Request → Response Flow
+
+   1️⃣ User Input    2️⃣ Validation    3️⃣ ML Processing    4️⃣ Storage    5️⃣ Response
+
+   ┌─────────┐     ┌─────────┐      ┌──────────────┐    ┌─────────┐    ┌─────────┐
+   │ "I love │────▶│ FastAPI │─────▶│ Transform    │───▶│ MongoDB │───▶│ JSON    │
+   │ this    │     │ Pydantic│      │ Models       │    │ (opt.)  │    │ Response│
+   │ API!"   │     │ Schema  │      │ • BERT       │    └─────────┘    │ + Score │
+   └─────────┘     └─────────┘      │ • RoBERTa    │                   └─────────┘
+                                    │ • DistilBERT │
+                                    └──────────────┘
 ```
 
-1. **Request Processing:**
+### Processing Steps:
 
-   - Requests enter through the API Gateway
-   - Authentication and validation occur immediately
-   - Clean, validated text is prepared for analysis
+1. **📝 Request Validation**
 
-2. **Sentiment Analysis:**
+   - Client sends POST request to `/api/v1/sentiment/analyze`
+   - Pydantic validates JSON payload and text content
+   - Text preprocessing (cleaning, tokenization)
 
-   - Validated text flows to the NLP Processing Engine
-   - Text undergoes preprocessing steps (tokenization, normalization)
-   - Preprocessed text is fed to the sentiment analysis model
-   - Results are generated with sentiment classification and confidence scores
+2. **🤖 Sentiment Analysis**
 
-3. **Data Storage and Caching:**
+   - Text tokenized for transformer models
+   - Multiple model inference (optional comparison)
+   - Confidence scores and classification results generated
 
-   - Results are stored in MongoDB for historical tracking
-   - Simultaneously cached in Redis for performance optimization
-   - Unique request IDs link results across the system
+3. **💾 Data Persistence (Optional)**
 
-4. **Response Delivery:**
-   - Response travels back through the API Gateway
-   - Future identical requests may be served directly from cache
+   - Results stored in MongoDB with unique session ID
+   - Historical tracking for analytics and comparison
+   - Fast retrieval for repeated analyses
+
+4. **📊 Response Formation**
+   - Structured JSON response with sentiment and confidence
+   - Multiple model results (if requested)
+   - Processing metadata and timing information
 
 ## Key Design Decisions
 
-### Scalability
+### 🎯 Learning-First Approach
 
-- **Horizontal Scaling:** Stateless design enables adding more container instances as needed
-- **Load Balancing:** Requests distributed across multiple instances of the NLP Processing Engine
-- **Independent Scaling:** Each component can scale according to its specific resource needs
+- **Simplified Architecture**: Focus on core concepts rather than complex patterns
+- **Local Development**: Docker Compose for easy setup, no cloud dependencies
+- **Progressive Enhancement**: Each development phase builds educational value
+- **Hands-on Learning**: Every feature chosen for its teaching potential
 
-### Separation of Concerns
+### 🏗️ Clean Architecture Patterns
 
-- Authentication logic, ML processing, and data storage operate independently
-- Makes the system easier to debug, test, and evolve
-- Enables specialized optimization for each component
+- **Repository Pattern**: Clean separation between data access and business logic
+- **Service Layer**: Dedicated services for ML processing and text analysis
+- **Dependency Injection**: FastAPI's built-in DI for testable components
+- **Configuration Management**: Environment-based config with sensible defaults
 
-### Performance Optimization
+### 🚀 Development Experience
 
-- **Lazy Model Loading:** Reduces startup time for the NLP container
-- **Efficient Caching:** Redis strategies for repeated analyses
-- **Database Indexing:** Optimized for common query patterns
-- **Async Processing:** FastAPI's asynchronous capabilities maximize throughput
+- **Fast Startup**: Lazy model loading reduces development iteration time
+- **Hot Reload**: FastAPI's `--reload` flag for instant code changes
+- **Interactive Documentation**: Automatic OpenAPI docs at `/docs` endpoint
+- **Comprehensive Testing**: Unit, integration, and API tests for confidence
 
-### Startup-Friendly Implementation
+### 📚 Educational Value
 
-- Initially deploy all containers on a single machine
-- Scale individual components based on actual usage patterns
-- Cost-effective resource utilization during early stages
+- **Multiple ML Models**: Compare different transformer architectures
+- **Database Integration**: Learn MongoDB document modeling
+- **API Design**: RESTful patterns with proper HTTP status codes
+- **Testing Strategies**: Different testing approaches and best practices
 
-## Sequence Diagram for Request Processing
+## Development Phases & Learning Progression
+
+### ✅ Phase 1: Foundation (Complete)
 
 ```
-Client        API Gateway        NLP Engine        MongoDB        Redis
-  |                |                 |                |              |
-  |---Request----->|                 |                |              |
-  |                |----Validate---->|                |              |
-  |                |                 |                |              |
-  |                |                 |--Process Text->|              |
-  |                |                 |                |              |
-  |                |                 |--Store Result->|              |
-  |                |                 |                |              |
-  |                |                 |--Cache Result---------------->|
-  |                |<---Result-------|                |              |
-  |<---Response----|                 |                |              |
-  |                |                 |                |              |
+FastAPI Setup ──▶ ML Models ──▶ Basic API ──▶ Documentation
+     🚀              🤖            📡            📚
 ```
 
-This sequence diagram illustrates the flow of a typical sentiment analysis request through the system, showing the interactions between different components and the data transformations that occur.
+### 🔄 Phase 2: Database Integration (Current)
+
+```
+MongoDB Setup ──▶ Repository Pattern ──▶ Data Storage ──▶ Historical APIs
+     🗄️                  🏗️                   💾              📊
+```
+
+### ⏳ Phase 3: Web Interface
+
+```
+HTML/CSS/JS ──▶ API Integration ──▶ Real-time UI ──▶ Visualization
+     🎨              🔌                ⚡              📈
+```
+
+### ⏳ Phase 4: Model Comparison
+
+```
+Multi-Model API ──▶ Performance Tests ──▶ Benchmarking ──▶ A/B Testing
+       🤖                   ⚡                  📊             🧪
+```
+
+## Request Flow Sequence
+
+```
+Client          FastAPI         ML Service      MongoDB         Response
+  │                │                │              │               │
+  │──POST /analyze─▶│                │              │               │
+  │                │──validate──────▶│              │               │
+  │                │                │──tokenize────▶│               │
+  │                │                │              │               │
+  │                │                │◀─inference───│               │
+  │                │                │              │               │
+  │                │                │──store result▶│               │
+  │                │◀──sentiment────│              │               │
+  │◀─JSON response─│                │              │               │
+  │                │                │              │               │
+```
+
+This sequence illustrates the simplified flow of a sentiment analysis request, emphasizing the learning aspects of each component interaction.
