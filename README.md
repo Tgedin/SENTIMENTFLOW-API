@@ -36,10 +36,10 @@ This project emphasizes **hands-on learning** over complex production features, 
 
 ## 📁 Documentation
 
-- [📋 Development Roadmap](docs/todo.md) - Current phase progress and learning objectives
+
 - [🏗️ Project Structure](docs/architecture/project_structure.md) - Complete directory organization
 - [🎨 System Design](docs/architecture/system_design.md) - Architecture and data flow
-- [🚀 API Documentation](http://localhost:8001/docs) - Interactive docs (when running)
+
 
 ## 🛠️ Technology Stack
 
