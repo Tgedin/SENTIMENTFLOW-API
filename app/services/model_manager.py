@@ -147,11 +147,21 @@ class ModelVersionHistory:
     
     def add_version(self, metadata: ModelMetadata) -> None:
         """Add a new version to the history."""
-        # If adding the "latest" version, we need special handling
+        # If adding the "latest" version, check if we already have one
         if metadata.version == "latest":
-            # Generate a new version ID based on timestamp if it's a "latest" version
-            timestamp_version = f"v_{int(time.time())}"
-            metadata.version = timestamp_version
+            # Check if we already have a "latest" version
+            if "latest" in self.versions:
+                # Update existing "latest" version instead of creating new one
+                logger.debug(f"Updating existing 'latest' version for model {self.model_id}")
+                self.versions["latest"] = metadata
+                self.active_version = "latest"
+                self._save_version_history()
+                return
+            
+            # Only create timestamp version if we need a specific versioned copy
+            # For normal use, keep it as "latest"
+            # timestamp_version = f"v_{int(time.time())}"
+            # metadata.version = timestamp_version
         
         self.versions[metadata.version] = metadata
         self.active_version = metadata.version  # Make this the active version

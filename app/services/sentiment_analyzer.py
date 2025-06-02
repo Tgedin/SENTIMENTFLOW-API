@@ -1,9 +1,11 @@
 import logging
-from typing import Dict, List, Optional, Tuple, Union
+import time
+from typing import Dict, List, Optional, Tuple, Union, Any
 
 import numpy as np
 import torch
-from transformers import Pipeline, pipeline
+from transformers.pipelines.base import Pipeline
+from transformers.pipelines import pipeline
 
 from app.config import settings
 from app.models.enums import SentimentLabel
@@ -52,12 +54,17 @@ class SentimentAnalyzer:
         if self.pipeline is None:
             logger.info(f"Loading sentiment analysis model: {self.model_name}")
             # Get the model metadata to understand its output format
-            self.model_meta = await self.model_manager.get_model_metadata(self.model_name)
+            self.model_meta = self.model_manager.get_model_metadata(self.model_name)
             
-            # Load the actual model pipeline
-            self.pipeline = await self.model_manager.load_model(
-                self.model_name, 
-                task="sentiment-analysis"
+            # Load the actual model and tokenizer
+            model, tokenizer, metadata = self.model_manager.get_model(self.model_name)
+            
+            # Create a pipeline from the model and tokenizer
+            self.pipeline = pipeline(
+                "sentiment-analysis",
+                model=model,
+                tokenizer=tokenizer,
+                top_k=None  # Return all scores instead of deprecated return_all_scores
             )
             
             # Cache the output labels for this model
@@ -73,7 +80,9 @@ class SentimentAnalyzer:
             List of label strings for the model.
         """
         # Try to get labels from the pipeline config
-        if hasattr(self.pipeline, "model") and hasattr(self.pipeline.model, "config"):
+        if (self.pipeline is not None and 
+            hasattr(self.pipeline, "model") and 
+            hasattr(self.pipeline.model, "config")):
             if hasattr(self.pipeline.model.config, "id2label"):
                 return list(self.pipeline.model.config.id2label.values())
         
@@ -122,6 +131,8 @@ class SentimentAnalyzer:
         
         try:
             # Run the model inference
+            if self.pipeline is None:
+                raise RuntimeError("Pipeline not loaded. Call load_model() first.")
             raw_result = self.pipeline(preprocessed_text)
             
             # Process and validate the results
@@ -171,20 +182,34 @@ class SentimentAnalyzer:
         for i in range(0, len(preprocessed_texts), batch_size):
             batch_texts = preprocessed_texts[i:i+batch_size]
             original_texts = texts[i:i+batch_size]
-            
             try:
                 # Run batch inference
+                if self.pipeline is None:
+                    raise RuntimeError("Pipeline not loaded. Call load_model() first.")
                 raw_results = self.pipeline(batch_texts)
-                
+                # Defensive: handle None, Tensor, or other non-iterable results
+                if raw_results is None:
+                    processed_results = []
+                elif isinstance(raw_results, list):
+                    processed_results = raw_results
+                elif hasattr(raw_results, '__iter__') and not isinstance(raw_results, (str, bytes, dict)):
+                    try:
+                        processed_results = list(raw_results)
+                    except Exception as convert_error:
+                        logger.error(f"Failed to convert results to list: {convert_error}")
+                        processed_results = []
+                else:
+                    processed_results = [raw_results]
+
                 # Process each result in the batch
-                for j, raw_result in enumerate(raw_results):
-                    result = self._process_result(
-                        original_texts[j], 
-                        batch_texts[j], 
-                        raw_result
-                    )
-                    results.append(result)
-                    
+                for j, raw_result in enumerate(processed_results):
+                    if j < len(original_texts):  # Safety check
+                        result = self._process_result(
+                            original_texts[j], 
+                            batch_texts[j], 
+                            raw_result
+                        )
+                        results.append(result)
             except Exception as e:
                 logger.error(f"Error analyzing batch: {str(e)}", exc_info=True)
                 # Add error results for this batch
@@ -197,7 +222,7 @@ class SentimentAnalyzer:
         
         return results
     
-    def _process_result(self, original_text: str, preprocessed_text: str, raw_result: Dict) -> Dict:
+    def _process_result(self, original_text: str, preprocessed_text: str, raw_result: Any) -> Dict:
         """
         Process and validate the raw model output into a standardized format.
         
@@ -221,7 +246,33 @@ class SentimentAnalyzer:
             raw_result = [raw_result]
             
         # Extract the primary sentiment and confidence
-        primary_sentiment = raw_result[0]
+        # When using top_k=None, the result is a list of all score dicts
+        logger.debug(f"Raw result type: {type(raw_result)}, content: {raw_result}")
+        
+        if isinstance(raw_result, list) and len(raw_result) > 0:
+            # Check what type of items are in the list
+            first_item = raw_result[0]
+            logger.debug(f"First item type: {type(first_item)}, content: {first_item}")
+            
+            # Handle nested list format: [[{'label': 'POSITIVE', 'score': 0.999}]]
+            if isinstance(first_item, list) and len(first_item) > 0:
+                logger.debug("Detected nested list format, flattening...")
+                raw_result = first_item  # Flatten the nested list
+                first_item = raw_result[0]
+                logger.debug(f"After flattening - first item: {first_item}")
+            
+            if isinstance(first_item, dict):
+                # Sort by score to get the highest confidence prediction
+                sorted_results = sorted(raw_result, key=lambda x: x["score"], reverse=True)
+                primary_sentiment = sorted_results[0]
+            else:
+                # If it's not a dict, log the issue
+                logger.warning(f"Unexpected item format in results: {first_item}")
+                primary_sentiment = {"label": "unknown", "score": 0.0}
+        else:
+            # Fallback for unexpected format
+            logger.warning(f"Unexpected result format: {raw_result}")
+            primary_sentiment = {"label": "unknown", "score": 0.0}
         
         # Add the primary sentiment details
         result["sentiment"] = self._normalize_sentiment_label(primary_sentiment["label"])
@@ -257,6 +308,14 @@ class SentimentAnalyzer:
         Returns:
             Normalized label string
         """
+        # Handle CardiffNLP Twitter RoBERTa model labels
+        if label.lower() in ["label_0"]:
+            return SentimentLabel.NEGATIVE.value
+        elif label.lower() in ["label_1"]:
+            return SentimentLabel.NEUTRAL.value
+        elif label.lower() in ["label_2"]:
+            return SentimentLabel.POSITIVE.value
+            
         # Handle star-based labels (convert to positive/negative/neutral)
         if label in ["1 star", "2 stars"]:
             return SentimentLabel.NEGATIVE.value

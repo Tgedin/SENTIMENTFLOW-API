@@ -1,161 +1,105 @@
 # SentimentFlow API
 
-> **🎯 Learning-Focused FastAPI & ML Integration Project**
+> **A hands-on learning project for FastAPI and machine learning integration**
 
-A hands-on learning project that demonstrates modern Python API development with FastAPI and machine learning model integration. Built for **local development** and educational purposes.
+A complete sentiment analysis system demonstrating modern Python API development with multiple ML models, database integration, and a clean web interface.
 
-```
-                    📊 Sentiment Analysis Pipeline
+## ✨ What it does
 
-   User Input  ──▶  FastAPI  ──▶  ML Models  ──▶  MongoDB  ──▶  Results
-      📝            🚀           🤖 BERT         🗄️           📈
-                                🤖 RoBERTa
-                                🤖 DistilBERT
-```
-
-## 🎯 Project Purpose
-
-This project emphasizes **hands-on learning** over complex production features, focusing on:
-
-- **FastAPI Framework**: Modern Python API development with automatic documentation
-- **ML Model Integration**: Multiple transformer models (BERT, RoBERTa, DistilBERT)
-- **Local Database**: MongoDB integration with Docker Compose
-- **Testing Strategies**: Unit, integration, and API testing patterns
-- **Clean Architecture**: Repository patterns and service layer design
-- **Documentation**: Professional-level docs for learning best practices
-
-## ✨ Key Features
-
-- 🔍 **Real-time sentiment analysis** with confidence scores
-- 🤖 **Multiple ML models** comparison (BERT variants)
-- 📊 **Historical data storage** with MongoDB
-- 🚀 **Interactive API docs** at `/docs` endpoint
-- 🧪 **Comprehensive testing** suite
-- 🎨 **Simple web interface** for demonstration
-- ⚡ **Fast local development** setup
-
-## 📁 Documentation
-
-
-- [🏗️ Project Structure](docs/architecture/project_structure.md) - Complete directory organization
-- [🎨 System Design](docs/architecture/system_design.md) - Architecture and data flow
-
-
-## 🛠️ Technology Stack
-
-```
-   API Layer          ML Layer           Data Layer
-   ┌─────────┐       ┌─────────┐       ┌─────────┐
-   │ FastAPI │ ────▶ │  BERT   │ ────▶ │ MongoDB │
-   │ Uvicorn │       │ RoBERTa │       │ Docker  │
-   │ Pydantic│       │DistilBERT│      │ Compose │
-   └─────────┘       └─────────┘       └─────────┘
-```
-
-- **🐍 Backend**: FastAPI (Python 3.12+)
-- **🤖 ML Models**: Hugging Face Transformers (BERT, RoBERTa, DistilBERT)
-- **🗄️ Database**: MongoDB with Docker Compose
-- **🔧 Core Tools**: Uvicorn, Pydantic, pytest
-- **📦 Development**: Docker, Docker Compose
-- **🧪 Testing**: pytest, httpx, unittest
+- **Analyzes sentiment** of any text using state-of-the-art BERT models
+- **Compares models** - DistilBERT, RoBERTa (Twitter), and Multilingual BERT
+- **Stores results** in MongoDB with session tracking
+- **Web interface** for real-time analysis and testing
+- **RESTful API** with automatic documentation
 
 ## 🚀 Quick Start
 
-### Prerequisites
+```bash
+# Clone and setup
+git clone <repo-url>
+cd sentimentflow-api
 
-- Python 3.12+
-- Docker & Docker Compose
-- Git
+# Start services
+docker-compose up -d  # MongoDB & Redis
+pip install -r requirements.txt
 
-### Setup
+# Run the API
+uvicorn app.main:app --reload
 
-1. **Clone the repository:**
+# Open in browser
+# API: http://localhost:8000/docs
+# Web: frontend/index.html
+```
 
-   ```bash
-   git clone https://github.com/Tgedin/sentimentflow-api.git
-   cd sentimentflow-api
-   ```
+## 🎯 Key Features
 
-2. **Create virtual environment:**
+- **3 ML Models**: Compare different sentiment analysis approaches
+- **Real-time Analysis**: Fast inference with confidence scores
+- **Historical Data**: Store and query past analyses
+- **Clean Architecture**: Repository pattern, service layers
+- **Comprehensive Testing**: 98% test coverage
+- **Modern Frontend**: Responsive web interface
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # Windows: venv\Scripts\activate
-   ```
+## 🏗️ Architecture
 
-3. **Install dependencies:**
+```
+API Layer          ML Layer           Data Layer
+┌─────────┐       ┌─────────┐       ┌─────────┐
+│ FastAPI │ ────▶ │  BERT   │ ────▶ │ MongoDB │
+│ Pydantic│       │ RoBERTa │       │ Session │
+│ Uvicorn │       │DistilBERT│      │ Storage │
+└─────────┘       └─────────┘       └─────────┘
+```
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+**Tech Stack:**
 
-4. **Start MongoDB (optional for basic testing):**
+- **FastAPI** - Modern Python web framework
+- **Transformers** - Hugging Face ML models
+- **MongoDB** - Document database
+- **Docker** - Development environment
 
-   ```bash
-   docker-compose up -d
-   ```
+## 📊 API Endpoints
 
-5. **Run the API:**
+- `POST /api/v1/sentiment/analyze` - Analyze single text
+- `POST /api/v1/sentiment/analyze/batch` - Analyze multiple texts
+- `GET /api/v1/sentiment/models` - List available models
+- `GET /api/v1/history/sessions` - Get analysis history
+- `GET /health` - System health check
 
-   ```bash
-   uvicorn app.main:app --reload --port 8001
-   ```
-
-6. **Test the API:**
-   ```bash
-   # Open browser to http://localhost:8001/docs
-   # Or test with curl:
-   curl -X POST "http://localhost:8001/api/v1/sentiment/analyze" \
-        -H "Content-Type: application/json" \
-        -d '{"text": "I love learning FastAPI!"}'
-   ```
-
-## 🧪 Running Tests
+## 🧪 Testing
 
 ```bash
 # Run all tests
 pytest
 
-# Run with coverage
-pytest --cov=app
-
-# Run specific test categories
+# Run specific test types
 pytest tests/unit/        # Unit tests
 pytest tests/integration/ # Integration tests
+pytest tests/e2e/         # End-to-end tests
 ```
 
-## 📈 Current Progress
+## 📈 Project Status
 
-- ✅ **Phase 1**: Core API & ML integration (Complete)
-- 🔄 **Phase 2**: Database & storage (In Progress)
-- ⏳ **Phase 3**: Web interface
-- ⏳ **Phase 4**: Model comparison & testing
-- ⏳ **Phase 5**: Documentation & polish
+- ✅ **Phase 1**: Core API & ML integration
+- ✅ **Phase 2**: Database & comprehensive testing
+- ✅ **Phase 3**: Web interface & optimization
+- ⏳ **Phase 4**: Advanced features (optional)
+- ⏳ **Phase 5**: Production deployment (optional)
 
-## 🎓 Learning Outcomes
+## 🎓 Learning Focus
 
-Through this project, you'll gain hands-on experience with:
+This project demonstrates:
 
-- 🚀 **FastAPI**: Modern async Python web framework
-- 🤖 **ML Integration**: Working with transformer models
-- 🗄️ **Database Design**: MongoDB document modeling
-- 🧪 **Testing**: API testing strategies and best practices
-- 📚 **Documentation**: Writing clear, professional docs
-- 🛠️ **Development**: Local development workflow and tooling
+- **Modern Python APIs** with FastAPI and async/await
+- **ML Model Integration** using Hugging Face transformers
+- **Database Design** with MongoDB and repository patterns
+- **Testing Strategies** from unit to integration testing
+- **Clean Code Architecture** with proper separation of concerns
 
-## 🤝 Contributing
+## 📁 Documentation
 
-This is a personal learning project, but feedback and suggestions are welcome! Feel free to:
-
-- 🐛 Report bugs or issues
-- 💡 Suggest improvements or learning opportunities
-- 📚 Share educational resources related to the tech stack
-- 🤔 Ask questions about the implementation
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-_Built with ❤️ for learning FastAPI and ML integration_
+- [Project Status & Todo](docs/todo.md) - Current progress and next steps
+- [Final Status Report](docs/FINAL_PROJECT_STATUS.md) - Complete project summary
+- [API Documentation](docs/api/) - Detailed endpoint documentation
+- [Architecture Guide](docs/architecture/) - System design and structure
+- [Frontend Guide](frontend/README.md) - Web interface documentation

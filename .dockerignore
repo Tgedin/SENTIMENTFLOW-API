@@ -1,0 +1,61 @@
+# Docker ignore for SentimentFlow API
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Python virtual environment
+venv/
+.venv/
+env/
+.env/
+*/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE and OS specific
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Data and large files - adjust if models need to be in the image
+# If models are downloaded at runtime or mounted as a volume, ignore them here.
+data/
+# Or be more specific if some subdirectories of data are needed:
+# data/models_to_ignore/
+
+# Test files and reports
+tests/
+.pytest_cache/
+htmlcov/
+.coverage
+*.log
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Local configuration (if any, that shouldn't be in the image)
+# local_settings.py
+
+# Notebooks (if not part of the runtime)
+*.ipynb
+.ipynb_checkpoints/
+
+# Requirements files (already handled by COPY in Dockerfile)
+# requirements.txt (if copied separately and not needed in context for other reasons)
+# requirements-dev.txt
+
+# Documentation (if not served by the app)
+# docs/

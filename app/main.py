@@ -2,6 +2,7 @@ import logging
 import time
 from contextlib import asynccontextmanager
 from typing import Callable
+import asyncio
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,6 +11,8 @@ from fastapi.responses import JSONResponse
 from app.api.v1.router import api_router
 from app.core.exceptions import CustomException
 from app.core.logging import setup_logging
+from app.database.connection import database_manager
+from app.database.migrations.init_db import initialize_database
 
 # Set up logging configuration
 logger = logging.getLogger(__name__)
@@ -24,11 +27,45 @@ async def lifespan(app: FastAPI):
     # Setup - runs before application starts accepting requests
     setup_logging()
     app.state.start_time = time.time()
+
+    # Initialize database connection and setup
+    try:
+        logger.info("Initializing database connection...")
+
+        # Connect to database using global database manager
+        # Let motor handle event loop automatically
+        await database_manager.connect()
+
+        # Check database health
+        if await database_manager.health_check():
+            logger.info("Database connection successful")
+
+            # Initialize database (indexes, collections, etc.)
+            await initialize_database()
+            logger.info("Database initialization complete")
+        else:
+            logger.error("Database health check failed")
+            raise RuntimeError("Database connection unhealthy")
+
+    except RuntimeError as e:
+        logger.error(f"RuntimeError during lifespan setup: {e}")
+        raise RuntimeError("CRITICAL: Database initialization failed during application startup") from e
+    except Exception as e:
+        logger.error(f"Failed to initialize database: {e}")
+        raise
+
     logger.info("Application startup complete")
-    
+
     yield
-    
+
     # Cleanup - runs when application is shutting down
+    try:
+        # Close database connections using global database manager
+        await database_manager.disconnect()
+        logger.info("Database connections closed")
+    except Exception as e:
+        logger.error(f"Error closing database connections: {e}")
+
     logger.info("Application shutdown complete")
 
 def create_app() -> FastAPI:

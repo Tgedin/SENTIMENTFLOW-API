@@ -90,6 +90,10 @@ class Settings(BaseSettings):
     DEFAULT_MODEL: str = "distilbert-base-uncased-finetuned-sst-2-english"
     TEXT_MAX_LENGTH: int = 512
     BATCH_SIZE: int = 16
+    MAX_BATCH_SIZE: int = Field(
+        100,
+        description="Maximum number of texts allowed in batch requests"
+    )
     
     # Rate limiting
     RATE_LIMIT_ENABLED: bool = Field(

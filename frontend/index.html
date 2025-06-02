@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentimentFlow - Real-time Sentiment Analysis</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 SentimentFlow</h1>
+            <p>Real-time sentiment analysis powered by BERT models</p>
+        </header>
+
+        <main>
+            <div class="input-section">
+                <label for="text-input">Enter text to analyze:</label>
+                <textarea 
+                    id="text-input" 
+                    placeholder="Type or paste your text here... (e.g., 'I love this product!' or 'This is terrible')"
+                    rows="4"
+                ></textarea>
+                
+                <div class="controls">
+                    <select id="model-select">
+                        <option value="">Default Model (DistilBERT)</option>
+                        <option value="cardiffnlp/twitter-roberta-base-sentiment">RoBERTa (Twitter)</option>
+                        <option value="nlptown/bert-base-multilingual-uncased-sentiment">BERT (Multilingual)</option>
+                    </select>
+                    
+                    <button id="analyze-btn" onclick="analyzeSentiment()">
+                        Analyze Sentiment
+                    </button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p>Analyzing sentiment...</p>
+            </div>
+
+            <div id="results" class="results hidden">
+                <h3>Analysis Results</h3>
+                <div class="result-card">
+                    <div class="sentiment-display">
+                        <span id="sentiment-label"></span>
+                        <span id="sentiment-emoji"></span>
+                    </div>
+                    <div class="confidence-display">
+                        <label>Confidence Score:</label>
+                        <div class="confidence-bar">
+                            <div id="confidence-fill"></div>
+                        </div>
+                        <span id="confidence-score"></span>
+                    </div>
+                    <div class="model-info">
+                        <small>Model used: <span id="model-used"></span></small>
+                    </div>
+                </div>
+            </div>
+
+            <div id="error" class="error hidden">
+                <h3>⚠️ Error</h3>
+                <p id="error-message"></p>
+            </div>
+        </main>
+
+        <footer>
+            <p>Built with FastAPI + BERT | <a href="/docs" target="_blank">View API Docs</a></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
